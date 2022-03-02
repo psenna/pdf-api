@@ -1,14 +1,28 @@
 from io import BytesIO
+import os
 from typing import List
-from fastapi import FastAPI, UploadFile, Form, HTTPException
-from fastapi.responses import StreamingResponse
+from fastapi import FastAPI, UploadFile, Form, HTTPException, Request
+from fastapi.responses import StreamingResponse, HTMLResponse
+from fastapi.templating import Jinja2Templates
+from fastapi.staticfiles import StaticFiles
 import fitz
 
 app = FastAPI()
 
+dirname = os.path.dirname(__file__)
+
+app.mount("/assets", StaticFiles(directory=os.path.join(dirname, 'assets')), name="assets")
+
+templates = Jinja2Templates(directory=os.path.join(dirname, 'templates'))
+
 @app.get("/")
 async def home():
     return {"Home"}
+
+@app.get("/join_pdf", response_class=HTMLResponse)
+async def join_pdf_page(request: Request):
+    return templates.TemplateResponse("join_pdf.html", {"request": request, "titulo": "Api de PDFs"})
+    
 
 @app.post("/join_pdf")
 async def join_pdf(pdf_files: List[UploadFile], output_file_name:str = Form("out.pdf")):
