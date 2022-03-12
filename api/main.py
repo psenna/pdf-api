@@ -15,13 +15,13 @@ app.mount("/assets", StaticFiles(directory=os.path.join(dirname, 'assets')), nam
 
 templates = Jinja2Templates(directory=os.path.join(dirname, 'templates'))
 
-@app.get("/")
-async def home():
-    return {"Home"}
+@app.get("/", response_class=HTMLResponse)
+async def home(request: Request):
+    return templates.TemplateResponse("home.html", {"request": request, "titulo": "Api de PDFs"})
 
 @app.get("/join_pdf", response_class=HTMLResponse)
 async def join_pdf_page(request: Request):
-    return templates.TemplateResponse("join_pdf.html", {"request": request, "titulo": "Api de PDFs"})
+    return templates.TemplateResponse("join_pdf.html", {"request": request})
     
 
 @app.post("/join_pdf")
